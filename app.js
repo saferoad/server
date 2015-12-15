@@ -23,6 +23,7 @@ io.on('connection', function (socket) {
   console.log("Connected!");
   
   socket.on('led.init', function(data) {
+  	console.log("Saved led socket");
     ledSocket = socket;
   });
 

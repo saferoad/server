@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title></title>
+		<script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
+	</head>
+	<body>
+		<div>
+			<label>Switch LED</label>
+			<input type="checkbox" id="checkbox">
+		</div>
+
+		<script>
+			$(document).ready(function () {
+				var socket = io('http://localhost:8080');
+		  
+				$("#checkbox").on('change', function() {
+					this.checked
+					socket.emit('led.update', { power: this.checked });
+				})
+			})
+		</script>
+
+		<script src="/socket.io/socket.io.js"></script>
+</body>
+</html>
