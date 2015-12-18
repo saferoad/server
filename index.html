@@ -6,17 +6,15 @@
 	</head>
 	<body>
 		<div>
-			<label>Switch LED</label>
-			<input type="checkbox" id="checkbox">
+			<button id="update">Update code</button>>
 		</div>
 
 		<script>
 			$(document).ready(function () {
 				var socket = io('http://localhost:8080');
 		  
-				$("#checkbox").on('change', function() {
-					this.checked
-					socket.emit('led.update', { power: this.checked });
+				$("#update").on('click', function() {
+					socket.emit('git.pull', {});
 				})
 			})
 		</script>
