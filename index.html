@@ -6,12 +6,12 @@
 	</head>
 	<body>
 		<div>
-			<button id="update">Update code</button>>
+			<button id="update">Update code</button>
 		</div>
 
 		<script>
 			$(document).ready(function () {
-				var socket = io('http://localhost:8080');
+				var socket = io('http://10.132.205.225');
 		  
 				$("#update").on('click', function() {
 					socket.emit('git.pull', {});

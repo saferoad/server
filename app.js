@@ -28,7 +28,9 @@ io.on('connection', function (socket) {
   });
 
   socket.on('git.pull', function (data) {
+    console.log("git pull request received!");
     for(var i in rpis) {
+      console.log("git pull request sent to "+i);
       rpis[i].emit("git.pull");
     }
   });
