@@ -3,19 +3,115 @@
 	<head>
 		<title></title>
 		<script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
+		<style type="text/css">
+			#road {
+				width:450px;
+			}
+			#road > div.road-side{
+				width:200px;
+				height:3300px;
+				background-color: grey;
+			}
+			#left-side {
+				border-right: 4px #bbbbbb dashed;
+				position:relative;
+			}
+			.clear {
+				clear:both;
+			}
+			.radar {
+			    width: 30px;
+				height: 15px;
+				background-color: black;
+				margin-bottom: 130px;
+			}
+			.left {
+				float:left;
+			}
+			#car {
+				width: 50px;
+			    height: 200px;
+			    border-radius: 15px;
+			    background-color: red;
+			    position: absolute;
+			    top: -200px;
+			    left: 72px;
+			}
+			.light-up {
+				background-color: green;
+			}
+		</style>
 	</head>
 	<body>
-		<div>
-			<button id="update">Update code</button>
+		<div id="road">
+			<div id="left-side" class="road-side left">
+				<div class="left">
+					<div class="radar" data-pos="30">1</div>
+					<div class="radar" data-pos="60">2</div>
+					<div class="radar" data-pos="90">3</div>
+					<div class="radar" data-pos="120">4</div>
+					<div class="radar" data-pos="150">5</div>
+				<div id="car" class='left'></div>
+				<div class="clear"></div>
+			</div>
+			<div id="right-side" class="road-side left"></div>
+			<div class="clear"></div>
 		</div>
 
 		<script>
 			$(document).ready(function () {
-				var socket = io('http://45.55.220.113/');
-		  
-				$("#update").on('click', function() {
-					socket.emit('git.pull', {});
-				})
+				var socket = io(window.location.href);
+				var radars = [];
+				var lightTimeouts = {};
+
+				init = function(){
+					var radarEls = $(".radar");
+
+					radarEls.each(function(i, el){
+						radars[i] = {
+							"pos": $(el).data("pos"),
+							"index": i
+						}
+					});
+
+					socket.emit("rpi.init", radars);
+				}
+
+		 		var car = $("#car");
+				
+				setInterval(function() {
+					$("#car").css({
+						top: parseInt($("#car").css("top"))+2+"px"
+					})	
+				}, 10);
+
+				setInterval(function() {
+					var radarEls = $(".radar");
+					var car = $("#car");
+					radarEls.each(function(i, el) {
+						var radar = $(el);
+
+						if(radar.position().top > car.position().top && radar.position().top <= car.position().top + car.height()) {
+							socket.emit("capture.car", {"pos":radar.data('pos')});
+						}
+					});
+				},100);
+
+				socket.on("light.up", function(data) {
+					$($(".radar")[data.index]).addClass("light-up");
+					console.log("Lighting up #"+data.index);
+					
+					if(lightTimeouts[data.index]) {
+						clearTimeout(lightTimeouts[data.index]);
+						delete lightTimeouts[data.index];
+					}
+					
+					lightTimeouts[data.index] = setTimeout(function() {
+						$($(".radar")[data.index]).removeClass("light-up");
+					}, 500);
+				});
+
+				init();
 			})
 		</script>
 
